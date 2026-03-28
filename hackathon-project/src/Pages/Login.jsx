@@ -24,7 +24,8 @@ export default function Login() {
           </p>
           <h1 className="mt-2 text-3xl font-bold">Sign in</h1>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Use your account to access live dashboard data, alerts, guides, and support.
+            Use your account to access live dashboard data, alerts, guides, and
+            support.
           </p>
         </div>
 
@@ -42,8 +43,15 @@ export default function Login() {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-2 block text-sm font-semibold">Email, phone, or username</label>
+            <label
+              htmlFor="login-identifier"
+              className="mb-2 block text-sm font-semibold"
+            >
+              Email, phone, or username
+            </label>
             <input
+              id="login-identifier"
+              name="identifier"
               value={identifier}
               onChange={(event) => setIdentifier(event.target.value)}
               className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"
@@ -54,9 +62,16 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">Password</label>
+            <label
+              htmlFor="login-password"
+              className="mb-2 block text-sm font-semibold"
+            >
+              Password
+            </label>
             <div className="relative">
               <input
+                id="login-password"
+                name="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 pr-14 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"

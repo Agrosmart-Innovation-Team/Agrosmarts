@@ -46,10 +46,15 @@ export default function Signup() {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-2 block text-sm font-semibold">
+            <label
+              htmlFor="signup-full-name"
+              className="mb-2 block text-sm font-semibold"
+            >
               Full name
             </label>
             <input
+              id="signup-full-name"
+              name="full_name"
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
               className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"
@@ -60,8 +65,15 @@ export default function Signup() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">Email</label>
+            <label
+              htmlFor="signup-email"
+              className="mb-2 block text-sm font-semibold"
+            >
+              Email
+            </label>
             <input
+              id="signup-email"
+              name="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"
@@ -72,8 +84,15 @@ export default function Signup() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">Phone</label>
+            <label
+              htmlFor="signup-phone"
+              className="mb-2 block text-sm font-semibold"
+            >
+              Phone
+            </label>
             <input
+              id="signup-phone"
+              name="phone"
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
               className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"
@@ -84,8 +103,15 @@ export default function Signup() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">Role</label>
+            <label
+              htmlFor="signup-role"
+              className="mb-2 block text-sm font-semibold"
+            >
+              Role
+            </label>
             <select
+              id="signup-role"
+              name="role"
               value={role}
               onChange={(event) => setRole(event.target.value)}
               className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"
@@ -99,9 +125,16 @@ export default function Signup() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">Password</label>
+            <label
+              htmlFor="signup-password"
+              className="mb-2 block text-sm font-semibold"
+            >
+              Password
+            </label>
             <div className="relative">
               <input
+                id="signup-password"
+                name="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 pr-14 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"
@@ -123,11 +156,16 @@ export default function Signup() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">
+            <label
+              htmlFor="signup-confirm-password"
+              className="mb-2 block text-sm font-semibold"
+            >
               Confirm password
             </label>
             <div className="relative">
               <input
+                id="signup-confirm-password"
+                name="confirm_password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 className="w-full rounded-2xl border border-primary/15 bg-background-light px-4 py-3 pr-14 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-background-dark"
@@ -137,9 +175,7 @@ export default function Signup() {
               />
               <button
                 type="button"
-                onClick={() =>
-                  setShowConfirmPassword((current) => !current)
-                }
+                onClick={() => setShowConfirmPassword((current) => !current)}
                 aria-label={
                   showConfirmPassword ?
                     "Hide confirm password"
