@@ -4,12 +4,12 @@ import os
 # Network binding
 bind = os.getenv('GUNICORN_BIND', '0.0.0.0:8000')
 
-# Workers: (2 * CPU cores) + 1 is the recommended baseline
-# Override via env for smaller/larger instances
-workers = int(os.getenv('GUNICORN_WORKERS', multiprocessing.cpu_count() * 2 + 1))
+# Keep defaults conservative for small/free instances to avoid OOM restarts.
+default_workers = min(2, multiprocessing.cpu_count() or 1)
+workers = int(os.getenv('GUNICORN_WORKERS', str(default_workers)))
 
 # Threads per worker (good for I/O-bound Django views)
-threads = int(os.getenv('GUNICORN_THREADS', '4'))
+threads = int(os.getenv('GUNICORN_THREADS', '2'))
 
 # Worker class: 'sync' is safe for SQLite dev, use 'gthread' when scaling on PostgreSQL
 worker_class = os.getenv('GUNICORN_WORKER_CLASS', 'gthread')

@@ -38,6 +38,14 @@ if not SECRET_KEY:
 DEFAULT_ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
 ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS)
 
+RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME', '').strip()
+if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+if os.getenv('RENDER') and '.onrender.com' not in ALLOWED_HOSTS:
+    # Allow Render-assigned public hostnames for this app.
+    ALLOWED_HOSTS.append('.onrender.com')
+
 
 # Application definition
 
@@ -168,6 +176,10 @@ DEFAULT_CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', DEFAULT_CORS_ALLOWED_ORIGINS)
 CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS', CORS_ALLOWED_ORIGINS)
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https://.*\.onrender\.com$',
+]
 
 CORS_ALLOW_CREDENTIALS = True
 

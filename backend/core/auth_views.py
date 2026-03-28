@@ -61,6 +61,13 @@ class AgroSmartTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
+        # Accept email in the username field from clients and resolve to actual username.
+        identifier = (attrs.get('username') or '').strip()
+        if identifier and '@' in identifier:
+            matched_user = User.objects.filter(email__iexact=identifier).first()
+            if matched_user:
+                attrs['username'] = matched_user.username
+
         data = super().validate(attrs)
         data['role'] = get_user_role(self.user)
         data['username'] = self.user.username
@@ -76,8 +83,10 @@ class AgroSmartTokenObtainPairView(TokenObtainPairView):
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(min_length=3, max_length=150)
     email = serializers.EmailField(required=False, allow_blank=True)
+    phone = serializers.CharField(required=False, allow_blank=True, max_length=64)
+    full_name = serializers.CharField(required=False, allow_blank=True, max_length=512)
     password = serializers.CharField(min_length=8, write_only=True)
-    role = serializers.ChoiceField(choices=['farmer', 'officer'])
+    role = serializers.ChoiceField(choices=['farmer', 'officer', 'agronomist'])
 
 
 class RegisterView(APIView):
@@ -99,10 +108,16 @@ class RegisterView(APIView):
         )
 
         role = serializer.validated_data['role']
+        if role == 'agronomist':
+            role = 'officer'
         _assign_role(user, role)
 
         # Initialize a profile row at signup so onboarding updates an existing record.
-        FarmerProfile.objects.get_or_create(owner=user)
+        profile, _ = FarmerProfile.objects.get_or_create(owner=user)
+        full_name = serializer.validated_data.get('full_name', '').strip()
+        if full_name and profile.full_name != full_name:
+            profile.full_name = full_name
+            profile.save(update_fields=['full_name'])
 
         token_data = _token_payload_for(user)
         return Response(
