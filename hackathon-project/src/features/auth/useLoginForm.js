@@ -20,10 +20,13 @@ export default function useLoginForm() {
     setErrorMessage("");
 
     try {
+      const normalizedIdentifier = identifier.trim();
+      if (!normalizedIdentifier) {
+        throw new Error("Enter your email, phone, or username.");
+      }
+
       const authPayload = await loginRequest({
-        email: identifier,
-        username: identifier,
-        phone: identifier,
+        username: normalizedIdentifier,
         password,
       });
 

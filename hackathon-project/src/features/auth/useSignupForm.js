@@ -18,6 +18,13 @@ export default function useSignupForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
+    const buildUsername = () => {
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedPhone = phone.trim();
+        const normalizedName = fullName.trim().replace(/\s+/g, "_").toLowerCase();
+        return normalizedEmail || normalizedPhone || normalizedName;
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         setErrorMessage("");
@@ -30,11 +37,16 @@ export default function useSignupForm() {
         setIsSubmitting(true);
 
         try {
+            const username = buildUsername();
+            if (!username || username.length < 3) {
+                throw new Error("Provide an email, phone, or full name (at least 3 characters).");
+            }
+
             const signupPayload = await signupRequest({
-                full_name: fullName,
-                username: email || phone || fullName,
-                email,
-                phone,
+                full_name: fullName.trim(),
+                username,
+                email: email.trim().toLowerCase(),
+                phone: phone.trim(),
                 role,
                 password,
             });
@@ -43,9 +55,7 @@ export default function useSignupForm() {
 
             if (!signupPayload.accessToken) {
                 finalAuthPayload = await loginRequest({
-                    email,
-                    username: email || phone,
-                    phone,
+                    username,
                     password,
                 });
             }
