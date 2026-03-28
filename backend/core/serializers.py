@@ -1,7 +1,29 @@
+from datetime import datetime, timezone as dt_timezone
+from urllib.parse import parse_qs, urlparse
+
 from rest_framework import serializers
 
 from .models import Alert, Category, CropOption, FarmerProfile, Guide, SupportMessage
 from .security import decrypt_value, encrypt_value
+
+
+def _is_expired_signed_image_url(image_url):
+    if not image_url:
+        return False
+
+    try:
+        parsed = urlparse(str(image_url).strip())
+        if parsed.scheme not in {'http', 'https'}:
+            return False
+
+        expires_at = parse_qs(parsed.query).get('se', [None])[0]
+        if not expires_at:
+            return False
+
+        expires_at = expires_at.replace('Z', '+00:00')
+        return datetime.fromisoformat(expires_at) <= datetime.now(dt_timezone.utc)
+    except (TypeError, ValueError):
+        return False
 
 
 class FarmerProfileSerializer(serializers.ModelSerializer):
@@ -38,6 +60,12 @@ class CropOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CropOption
         fields = ['id', 'label', 'icon', 'image_url']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if _is_expired_signed_image_url(data.get('image_url')):
+            data['image_url'] = None
+        return data
 
 
 class AlertSerializer(serializers.ModelSerializer):

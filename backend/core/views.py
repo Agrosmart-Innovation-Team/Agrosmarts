@@ -2,6 +2,8 @@ from django.conf import settings as django_settings
 from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
+from datetime import datetime, timezone as dt_timezone
+from urllib.parse import parse_qs, urlparse
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -20,6 +22,29 @@ def _bust(*keys):
 
 def _crop_image_cache_key(crop_name):
 	return f"agrosmart:crop-image:{crop_name.strip().lower()}"
+
+
+def _is_expired_signed_image_url(image_url):
+	if not image_url:
+		return False
+
+	try:
+		parsed = urlparse(str(image_url).strip())
+		if parsed.scheme not in {'http', 'https'}:
+			return False
+
+		expires_at = parse_qs(parsed.query).get('se', [None])[0]
+		if not expires_at:
+			return False
+
+		expires_at = expires_at.replace('Z', '+00:00')
+		return datetime.fromisoformat(expires_at) <= datetime.now(dt_timezone.utc)
+	except (TypeError, ValueError):
+		return False
+
+
+def _usable_image_url(image_url):
+	return image_url if image_url and not _is_expired_signed_image_url(image_url) else ''
 
 from .models import (
 	Alert,
@@ -372,6 +397,11 @@ class GenerateCropImageView(APIView):
 			).first()
 
 			if crop_option and crop_option.image_url:
+				crop_option.image_url = _usable_image_url(crop_option.image_url)
+				if not crop_option.image_url:
+					crop_option.save(update_fields=['image_url'])
+					_bust('agrosmart:crops')
+				else:
 				return Response(
 					{
 						'image_url': crop_option.image_url,
@@ -432,16 +462,23 @@ class CropImageView(APIView):
 	def get(self, request, crop_name):
 		crop_name = crop_name.strip()
 		cached_url = cache.get(_crop_image_cache_key(crop_name))
-		if cached_url:
+		if cached_url and not _is_expired_signed_image_url(cached_url):
 			return Response({'image_url': cached_url, 'cached': True})
+		if cached_url:
+			cache.delete(_crop_image_cache_key(crop_name))
 
 		crop_option = None
 		try:
 			crop_option = CropOption.objects.filter(label__iexact=crop_name).first()
 
 			if crop_option and crop_option.image_url:
-				cache.set(_crop_image_cache_key(crop_name), crop_option.image_url, 60 * 60 * 24)
-				return Response({'image_url': crop_option.image_url, 'cached': True})
+				usable_url = _usable_image_url(crop_option.image_url)
+				if usable_url:
+					cache.set(_crop_image_cache_key(crop_name), usable_url, 60 * 60 * 24)
+					return Response({'image_url': usable_url, 'cached': True})
+				crop_option.image_url = None
+				crop_option.save(update_fields=['image_url'])
+				_bust('agrosmart:crops')
 
 			image_url = generate_crop_image(crop_name)
 
