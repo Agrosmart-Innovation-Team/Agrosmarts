@@ -4,8 +4,12 @@ import {
     isJwtExpired,
 } from "./auth";
 
+const DEFAULT_LOCAL_API_BASE_URL = "http://127.0.0.1:8000/api";
+const DEFAULT_PROD_API_BASE_URL = "https://agrosmart-backend.onrender.com/api";
+
 const API_BASE_URL = (
-    import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api"
+    import.meta.env.VITE_API_BASE_URL ||
+    (import.meta.env.PROD ? DEFAULT_PROD_API_BASE_URL : DEFAULT_LOCAL_API_BASE_URL)
 ).replace(/\/$/, "");
 
 const ALLOW_HTTP_IN_PROD = import.meta.env.VITE_ALLOW_HTTP_IN_PROD === "true";
@@ -142,11 +146,11 @@ export async function loginRequest(credentials) {
         const message =
             response.status === 401 ?
                 "Invalid email/phone or password."
-            : response.status === 404 ?
-                "No account found for these details. Please sign up first."
-            : response.status >= 500 ?
-                "Backend auth service error. Please try again shortly."
-            : `Login failed with status ${response.status}.`;
+                : response.status === 404 ?
+                    "No account found for these details. Please sign up first."
+                    : response.status >= 500 ?
+                        "Backend auth service error. Please try again shortly."
+                        : `Login failed with status ${response.status}.`;
 
         throw new Error(await getResponseMessage(response, message));
     }
@@ -165,11 +169,11 @@ export async function signupRequest(payload) {
         const message =
             response.status === 400 ?
                 "Signup details are invalid. Please check your inputs."
-            : response.status === 409 ?
-                "An account with these details already exists. Please sign in."
-            : response.status >= 500 ?
-                "Backend signup service error. Your account was not created."
-            : `Signup failed with status ${response.status}.`;
+                : response.status === 409 ?
+                    "An account with these details already exists. Please sign in."
+                    : response.status >= 500 ?
+                        "Backend signup service error. Your account was not created."
+                        : `Signup failed with status ${response.status}.`;
 
         throw new Error(await getResponseMessage(response, message));
     }
