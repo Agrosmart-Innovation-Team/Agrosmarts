@@ -35,6 +35,11 @@ services:
     rootDir: hackathon-project
     buildCommand: npm install && npm run build
     staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://agrosmart-backend.onrender.com/api
+      - key: VITE_ALLOW_HTTP_IN_PROD
+        value: false
     routes:
       - type: rewrite
         source: /*
