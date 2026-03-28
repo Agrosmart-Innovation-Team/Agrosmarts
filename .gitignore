@@ -1,0 +1,34 @@
+# Frontend (Vite + React)
+hackathon-project/node_modules/
+hackathon-project/dist/
+hackathon-project/.env.local
+hackathon-project/build/
+
+# Backend (Django)
+backend/venv/
+backend/.env
+backend/__pycache__/
+backend/db.sqlite3
+backend/*.pyc
+backend/.DS_Store
+backend/*.egg-info/
+backend/dist/
+backend/build/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
