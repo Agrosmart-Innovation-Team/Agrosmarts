@@ -258,6 +258,24 @@ if not DEBUG:
 ENCRYPTION_KEY = os.getenv('ENCRYPTION_KEY', '')
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
 
+# ── Email ──────────────────────────────────────────────────────────────────
+# Local dev: prints emails to the terminal console (no SMTP needed).
+# Production: set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+# and supply EMAIL_HOST / EMAIL_HOST_USER / EMAIL_HOST_PASSWORD via env vars.
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend',
+)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', True)
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'AgroSmart <noreply@agrosmart.com>')
+
+# URL of the deployed frontend — used to build password-reset links in emails.
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+
 # ── Caching ────────────────────────────────────────────────────────────────
 _REDIS_URL = os.getenv('REDIS_URL', '')
 if _REDIS_URL:

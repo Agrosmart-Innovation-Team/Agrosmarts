@@ -28,6 +28,15 @@ export default function Header() {
 
   const hideBackButton = ["/", "/login", "/signup"].includes(location.pathname);
 
+  const PAGE_TITLES = {
+    "/": "Farm Setup",
+    "/dashboard": "AgroSmart",
+    "/alerts": "Pest & Disease Alerts",
+    "/library": "Farming Library",
+    "/support": "Advisory Support",
+  };
+  const pageTitle = PAGE_TITLES[location.pathname] ?? "AgroSmart";
+
   return (
     <header className="w-full bg-background-light border-b border-primary/10 shadow-sm">
       <div className="relative max-w-7xl mx-auto px-4 py-4 flex items-center justify-center">
@@ -38,14 +47,16 @@ export default function Header() {
             className="absolute left-4 flex items-center justify-center text-black"
             aria-label="Go back"
           >
-            <span className="material-symbols-outlined text-2xl">arrow_back</span>
+            <span className="material-symbols-outlined text-2xl">
+              arrow_back
+            </span>
           </button>
         )}
         <span className="text-black text-xl font-bold tracking-wide">
-          Farm setup
+          {pageTitle}
         </span>
         <div className="absolute right-4 flex items-center gap-2">
-          {signedIn ? (
+          {signedIn ?
             <>
               <span className="hidden text-xs font-semibold text-gray-500 sm:block">
                 {authUser?.name || "Signed in"}
@@ -61,8 +72,7 @@ export default function Header() {
                 Logout
               </button>
             </>
-          ) : (
-            location.pathname !== "/login" && (
+          : location.pathname !== "/login" && (
               <button
                 type="button"
                 onClick={() => navigate("/login")}
@@ -71,7 +81,7 @@ export default function Header() {
                 Sign In
               </button>
             )
-          )}
+          }
         </div>
       </div>
     </header>

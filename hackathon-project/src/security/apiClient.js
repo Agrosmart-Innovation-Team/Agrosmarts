@@ -16,6 +16,10 @@ const ALLOW_HTTP_IN_PROD = import.meta.env.VITE_ALLOW_HTTP_IN_PROD === "true";
 const ENABLE_AUTH_GUARD = import.meta.env.VITE_ENABLE_AUTH_GUARD === "true";
 const LOGIN_ENDPOINT = import.meta.env.VITE_AUTH_LOGIN_PATH || "/auth/token";
 const SIGNUP_ENDPOINT = import.meta.env.VITE_AUTH_SIGNUP_PATH || "/auth/register";
+const FORGOT_PASSWORD_ENDPOINT =
+    import.meta.env.VITE_AUTH_FORGOT_PASSWORD_PATH || "/auth/forgot-password";
+const RESET_PASSWORD_ENDPOINT =
+    import.meta.env.VITE_AUTH_RESET_PASSWORD_PATH || "/auth/reset-password";
 
 export const AUTH_REQUIRED_EVENT = "agrosmart:auth-required";
 
@@ -180,4 +184,44 @@ export async function signupRequest(payload) {
 
     const responsePayload = await response.json();
     return normalizeAuthPayload(responsePayload);
+}
+
+export async function forgotPasswordRequest(payload) {
+    const response = await apiFetch(FORGOT_PASSWORD_ENDPOINT, {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const message =
+            response.status === 400
+                ? "Password reset details are invalid."
+                : response.status >= 500
+                    ? "Backend password reset service error. Please try again shortly."
+                    : `Password reset failed with status ${response.status}.`;
+
+        throw new Error(await getResponseMessage(response, message));
+    }
+
+    return response.json();
+}
+
+export async function resetPasswordConfirm(payload) {
+    const response = await apiFetch(RESET_PASSWORD_ENDPOINT, {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const message =
+            response.status === 400
+                ? await getResponseMessage(response, "Reset link is invalid or has expired.")
+                : response.status >= 500
+                    ? "Backend error. Please try again shortly."
+                    : `Password reset failed with status ${response.status}.`;
+
+        throw new Error(message);
+    }
+
+    return response.json();
 }

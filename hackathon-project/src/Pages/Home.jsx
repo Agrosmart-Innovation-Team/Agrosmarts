@@ -23,10 +23,18 @@ export default function Home() {
     apiStatus,
     currentStep,
     completionPercent,
-    isSetupComplete,
     handleGeolocate,
+    handleAddAddress,
     handleSubmit,
   } = useHomeSetup();
+
+  const mapQuery =
+    location.trim() ||
+    (coordinates ? `${coordinates.latitude},${coordinates.longitude}` : "");
+  const mapSrc =
+    mapQuery ?
+      `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=18&output=embed`
+    : "";
 
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white transition-colors duration-300">
@@ -102,6 +110,16 @@ export default function Home() {
                   <span className="material-symbols-outlined">my_location</span>
                   <span>Use Current GPS Location</span>
                 </button>
+                <button
+                  type="button"
+                  onClick={handleAddAddress}
+                  className="flex items-center gap-3 w-full p-3 rounded-xl border border-primary/20 bg-white dark:bg-background-dark hover:bg-primary/5 transition-colors text-primary font-semibold"
+                >
+                  <span className="material-symbols-outlined">
+                    add_location_alt
+                  </span>
+                  <span>Add Address</span>
+                </button>
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                     map
@@ -114,6 +132,17 @@ export default function Home() {
                     type="text"
                   />
                 </div>
+                {coordinates && (
+                  <div className="px-3 py-2 rounded-lg bg-primary/5 border border-primary/15">
+                    <p className="text-xs font-semibold text-primary">
+                      GPS Coordinates
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-mono">
+                      {coordinates.latitude.toFixed(6)},{" "}
+                      {coordinates.longitude.toFixed(6)}
+                    </p>
+                  </div>
+                )}
                 {geoStatus && (
                   <p
                     className={`text-xs mt-2 ${geoStatus.includes("Error") || geoStatus.includes("denied") ? "text-red-500 dark:text-red-300" : "text-gray-500 dark:text-gray-300"}`}
@@ -121,14 +150,18 @@ export default function Home() {
                     {geoStatus}
                   </p>
                 )}
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  If the map pin is slightly off, type your full address and the
+                  map will update automatically.
+                </p>
                 <div className="h-32 w-full rounded-xl overflow-hidden relative border border-primary/10 bg-center bg-cover">
-                  {coordinates ?
+                  {mapSrc ?
                     <iframe
                       title="Farm location map"
                       className="absolute inset-0 h-full w-full"
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.openstreetmap.org/export/embed.html?bbox=${coordinates.longitude - 0.02}%2C${coordinates.latitude - 0.02}%2C${coordinates.longitude + 0.02}%2C${coordinates.latitude + 0.02}&layer=mapnik&marker=${coordinates.latitude}%2C${coordinates.longitude}`}
+                      src={mapSrc}
                     ></iframe>
                   : <div
                       className="absolute inset-0 bg-center bg-cover"
@@ -138,8 +171,8 @@ export default function Home() {
                       }}
                     ></div>
                   }
-                  <div className="absolute inset-0 bg-black/20"></div>
-                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <div className="pointer-events-none absolute inset-0 bg-black/20"></div>
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-10">
                     <div className="size-12 rounded-full bg-white/95 border-2 border-primary shadow-lg shadow-primary/20 flex items-center justify-center">
                       <span className="material-symbols-outlined text-primary text-3xl">
                         location_on
@@ -202,6 +235,8 @@ export default function Home() {
                     className="w-full pl-4 pr-16 py-4 rounded-xl border border-primary/20 bg-gray-50 dark:bg-background-dark focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="Enter size"
                     type="number"
+                    min="0.1"
+                    step="0.1"
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-primary">
                     Acres
@@ -215,7 +250,7 @@ export default function Home() {
 
             <div className="pt-4 pb-6">
               <button
-                disabled={!isSetupComplete || isSavingSetup}
+                disabled={isSavingSetup}
                 className="w-full bg-primary hover:bg-primary/90 text-gray-900 font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                 type="submit"
               >
@@ -226,18 +261,9 @@ export default function Home() {
                 </span>
                 <span className="material-symbols-outlined">arrow_forward</span>
               </button>
-              {!isSetupComplete && (
-                <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
-                  Fill in all fields above to continue.
-                </p>
-              )}
-              <button
-                className="w-full mt-4 text-gray-500 dark:text-gray-400 font-medium py-2 hover:text-primary transition-colors"
-                type="button"
-                onClick={() => navigate("/dashboard")}
-              >
-                Skip for now
-              </button>
+              <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                Fill in all fields above to continue.
+              </p>
             </div>
           </form>
         </main>

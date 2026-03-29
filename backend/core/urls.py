@@ -1,7 +1,15 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .auth_views import AgroSmartTokenObtainPairView, GoogleAuthView, LogoutView, MeView, RegisterView
+from .auth_views import (
+    AgroSmartTokenObtainPairView,
+    GoogleAuthView,
+    LogoutView,
+    MeView,
+    PasswordResetConfirmView,
+    PasswordResetRequestView,
+    RegisterView,
+)
 
 from .views import (
     AlertListView,
@@ -27,6 +35,10 @@ urlpatterns = [
     path('auth/login/', AgroSmartTokenObtainPairView.as_view(), name='auth-login'),
     path('auth/register', RegisterView.as_view()),
     path('auth/register/', RegisterView.as_view(), name='auth-register'),
+    path('auth/forgot-password', PasswordResetRequestView.as_view()),
+    path('auth/forgot-password/', PasswordResetRequestView.as_view(), name='auth-forgot-password'),
+    path('auth/reset-password', PasswordResetConfirmView.as_view()),
+    path('auth/reset-password/', PasswordResetConfirmView.as_view(), name='auth-reset-password'),
     path('auth/token', AgroSmartTokenObtainPairView.as_view()),
     path('auth/token/', AgroSmartTokenObtainPairView.as_view(), name='auth-token'),
     path('auth/token/refresh', TokenRefreshView.as_view()),

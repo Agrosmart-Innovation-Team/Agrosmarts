@@ -402,13 +402,13 @@ class GenerateCropImageView(APIView):
 					crop_option.save(update_fields=['image_url'])
 					_bust('agrosmart:crops')
 				else:
-				return Response(
-					{
-						'image_url': crop_option.image_url,
-						'cached': True,
-					},
-					status=status.HTTP_200_OK,
-				)
+					return Response(
+						{
+							'image_url': crop_option.image_url,
+							'cached': True,
+						},
+						status=status.HTTP_200_OK,
+					)
 
 			# Generate new image
 			image_url = generate_crop_image(crop_name, provider=provider)

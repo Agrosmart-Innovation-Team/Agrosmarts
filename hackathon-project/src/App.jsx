@@ -7,8 +7,11 @@ import Library from "./Pages/Library";
 import Support from "./Pages/Support";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
+import ForgotPassword from "./Pages/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword";
 import AuthRedirectHandler from "./security/AuthRedirectHandler";
 import ProtectedRoute from "./security/ProtectedRoute";
+import SetupGuard from "./security/SetupGuard";
 
 function App() {
   return (
@@ -17,6 +20,11 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/reset-password/:uidb64/:token"
+          element={<ResetPassword />}
+        />
         <Route
           path="/"
           element={
@@ -26,10 +34,38 @@ function App() {
           }
         >
           <Route index element={<Home />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="alerts" element={<Alerts />} />
-          <Route path="library" element={<Library />} />
-          <Route path="support" element={<Support />} />
+          <Route
+            path="dashboard"
+            element={
+              <SetupGuard>
+                <Dashboard />
+              </SetupGuard>
+            }
+          />
+          <Route
+            path="alerts"
+            element={
+              <SetupGuard>
+                <Alerts />
+              </SetupGuard>
+            }
+          />
+          <Route
+            path="library"
+            element={
+              <SetupGuard>
+                <Library />
+              </SetupGuard>
+            }
+          />
+          <Route
+            path="support"
+            element={
+              <SetupGuard>
+                <Support />
+              </SetupGuard>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
@@ -37,6 +73,3 @@ function App() {
 }
 
 export default App;
-
-
-

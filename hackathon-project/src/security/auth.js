@@ -45,6 +45,7 @@ export function setAuthSession({ accessToken = "", refreshToken = "" } = {}) {
 export function clearAuthSession() {
   sessionStorage.removeItem(ACCESS_TOKEN_KEY);
   sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem("agrosmart_setup_complete");
   emitAuthStateChange();
 }
 

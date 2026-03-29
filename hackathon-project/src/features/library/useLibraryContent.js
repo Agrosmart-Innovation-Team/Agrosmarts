@@ -11,6 +11,55 @@ import {
     normalizeNotifications,
 } from "./utils";
 
+function mergeCategories(defaultItems, apiItems) {
+    const seen = new Set();
+    const merged = [];
+
+    for (const item of [...defaultItems, ...apiItems]) {
+        const key = String(item?.id || item?.title || "").trim().toLowerCase();
+        if (!key || seen.has(key)) {
+            continue;
+        }
+        seen.add(key);
+        merged.push(item);
+    }
+
+    return merged;
+}
+
+function mergeGuides(defaultItems, apiItems) {
+    const seen = new Set();
+    const merged = [];
+
+    for (const item of [...defaultItems, ...apiItems]) {
+        const key = String(item?.id || item?.title || "").trim().toLowerCase();
+        if (!key || seen.has(key)) {
+            continue;
+        }
+        seen.add(key);
+        merged.push(item);
+    }
+
+    return merged;
+}
+
+function mergeNotifications(defaultItems, apiItems) {
+    const seen = new Set();
+    const merged = [];
+
+    for (const item of [...defaultItems, ...apiItems]) {
+        const message = String(item || "").trim();
+        const key = message.toLowerCase();
+        if (!message || seen.has(key)) {
+            continue;
+        }
+        seen.add(key);
+        merged.push(message);
+    }
+
+    return merged;
+}
+
 export default function useLibraryContent() {
     const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS);
     const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
@@ -41,7 +90,9 @@ export default function useLibraryContent() {
 
                 if (categoriesResult.status === "fulfilled" && categoriesResult.value.ok) {
                     const categoriesData = await categoriesResult.value.json();
-                    setCategories(normalizeCategories(categoriesData));
+                    setCategories(
+                        mergeCategories(DEFAULT_CATEGORIES, normalizeCategories(categoriesData)),
+                    );
                     successfulSections += 1;
                 } else {
                     setCategories(DEFAULT_CATEGORIES);
@@ -50,7 +101,7 @@ export default function useLibraryContent() {
 
                 if (guidesResult.status === "fulfilled" && guidesResult.value.ok) {
                     const guidesData = await guidesResult.value.json();
-                    setGuides(normalizeGuides(guidesData));
+                    setGuides(mergeGuides(DEFAULT_GUIDES, normalizeGuides(guidesData)));
                     successfulSections += 1;
                 } else {
                     setGuides(DEFAULT_GUIDES);
@@ -62,7 +113,12 @@ export default function useLibraryContent() {
                     notificationsResult.value.ok
                 ) {
                     const notificationsData = await notificationsResult.value.json();
-                    setNotifications(normalizeNotifications(notificationsData));
+                    setNotifications(
+                        mergeNotifications(
+                            DEFAULT_NOTIFICATIONS,
+                            normalizeNotifications(notificationsData),
+                        ),
+                    );
                     successfulSections += 1;
                 } else {
                     setNotifications(DEFAULT_NOTIFICATIONS);

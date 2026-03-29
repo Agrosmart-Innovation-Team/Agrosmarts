@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import useAlertsData, { stylesBySeverity } from "../features/alerts/useAlertsData";
+import useAlertsData, {
+  stylesBySeverity,
+} from "../features/alerts/useAlertsData";
 
 export default function Alerts() {
   const navigate = useNavigate();
@@ -17,6 +19,12 @@ export default function Alerts() {
     cropOptions,
     hasHighRisk,
   } = useAlertsData();
+
+  const highCount = filteredAlerts.filter((a) => a.severity === "high").length;
+  const riskPercent =
+    filteredAlerts.length > 0 ?
+      Math.round((highCount / filteredAlerts.length) * 100)
+    : 0;
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white min-h-screen">
@@ -36,7 +44,15 @@ export default function Alerts() {
             Pest &amp; Disease Alerts
           </h2>
           <div className="flex w-12 items-center justify-end">
-            <button className="flex cursor-pointer items-center justify-center rounded-lg h-12 bg-transparent text-gray-900 dark:text-white">
+            <button
+              type="button"
+              onClick={() => {
+                setSeverityFilter("high");
+                setCropFilter("all");
+              }}
+              aria-label="Show high severity alerts"
+              className="flex cursor-pointer items-center justify-center rounded-lg h-12 bg-transparent text-gray-900 dark:text-white"
+            >
               <span className="material-symbols-outlined">notifications</span>
             </button>
           </div>
@@ -67,14 +83,17 @@ export default function Alerts() {
             </div>
             <p className="text-gray-800 dark:text-gray-200 text-base font-medium">
               {hasHighRisk ?
-                "Outbreak detected within 10km of your current region."
+                `${highCount} high-severity alert${highCount !== 1 ? "s" : ""} detected in your current filters.`
               : "No severe outbreak detected in your selected filters."}
             </p>
             <div
               className={`w-full rounded-full h-2 ${hasHighRisk ? "bg-red-200 dark:bg-red-800/40" : "bg-green-200 dark:bg-green-800/40"}`}
             >
               <div
-                className={`h-2 rounded-full ${hasHighRisk ? "bg-red-600 w-[85%]" : "bg-green-600 w-[30%]"}`}
+                className={`h-2 rounded-full transition-all duration-500 ${hasHighRisk ? "bg-red-600" : "bg-green-600"}`}
+                style={{
+                  width: `${hasHighRisk ? Math.max(riskPercent, 20) : Math.max(100 - riskPercent, 20)}%`,
+                }}
               ></div>
             </div>
           </div>

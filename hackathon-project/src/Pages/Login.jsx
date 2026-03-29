@@ -90,6 +90,14 @@ export default function Login() {
                 </span>
               </button>
             </div>
+            <div className="mt-2 text-right">
+              <Link
+                className="text-sm font-semibold text-primary"
+                to="/forgot-password"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           <button
