@@ -2,7 +2,8 @@ import multiprocessing
 import os
 
 # Network binding
-bind = os.getenv('GUNICORN_BIND', '0.0.0.0:8000')
+default_port = os.getenv('PORT', '8000')
+bind = os.getenv('GUNICORN_BIND', f'0.0.0.0:{default_port}')
 
 # Keep defaults conservative for small/free instances to avoid OOM restarts.
 default_workers = min(2, multiprocessing.cpu_count() or 1)
