@@ -45,18 +45,21 @@ const CROP_IMAGE_ALIASES = {
 };
 
 const CROP_IMAGE_URLS = {
-  cassava: "https://images.unsplash.com/photo-1625246333195-78d9c38ad576?auto=format&fit=crop&w=1200&h=800&q=80",
-  maize: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=1200&h=800&q=80",
-  rice: "https://images.unsplash.com/photo-1595856957941-6b0e8b0d0b0f?auto=format&fit=crop&w=1200&h=800&q=80",
-  wheat: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=1200&h=800&q=80",
-  coffee: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1200&h=800&q=80",
+  // Primary seeded crops
+  maize: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=1200&h=800&q=80",
+  rice: "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=1200&h=800&q=80",
+  coffee: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1200&h=800&q=80",
+  cassava: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=1200&h=800&q=80",
+  // Other common crops
+  wheat: "https://images.unsplash.com/photo-1473923899519-b1ba4ba1c7b4?auto=format&fit=crop&w=1200&h=800&q=80",
   tomato: "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=1200&h=800&q=80",
-  beans: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&h=800&q=80",
+  beans: "https://images.unsplash.com/photo-1605197161470-5d5e7d9ea7d2?auto=format&fit=crop&w=1200&h=800&q=80",
   yam: "https://images.unsplash.com/photo-1585518419759-107de4f5ed4d?auto=format&fit=crop&w=1200&h=800&q=80",
-  groundnut: "https://images.unsplash.com/photo-1599599810694-3f1c1318b8f5?auto=format&fit=crop&w=1200&h=800&q=80",
-  plantain: "https://images.unsplash.com/photo-1599599810694-3f1c1318b8f5?auto=format&fit=crop&w=1200&h=800&q=80",
-  pepper: "https://images.unsplash.com/photo-1599599810694-3f1c1318b8f5?auto=format&fit=crop&w=1200&h=800&q=80",
-  okra: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&h=800&q=80",
+  groundnut: "https://images.unsplash.com/photo-1567529692333-de9fd6772897?auto=format&fit=crop&w=1200&h=800&q=80",
+  plantain: "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?auto=format&fit=crop&w=1200&h=800&q=80",
+  pepper: "https://images.unsplash.com/photo-1526346698789-22fd84314424?auto=format&fit=crop&w=1200&h=800&q=80",
+  okra: "https://images.unsplash.com/photo-1628260412297-a3377e45006f?auto=format&fit=crop&w=1200&h=800&q=80",
+  soybean: "https://images.unsplash.com/photo-1591189863430-ab87e120f312?auto=format&fit=crop&w=1200&h=800&q=80",
 };
 
 function normalizeCropKey(cropName) {
@@ -95,6 +98,11 @@ export async function fetchCropImage(cropName) {
   try {
     const normalized = normalizeCropKey(cropName);
     const alias = CROP_IMAGE_ALIASES[normalized] || normalized;
+
+    // Use static URLs for known crops — no API call needed, shows real photos instantly.
+    if (CROP_IMAGE_URLS[alias]) {
+      return CROP_IMAGE_URLS[alias];
+    }
 
     const response = await apiFetch(`/crops/${encodeURIComponent(alias)}/image`);
 
