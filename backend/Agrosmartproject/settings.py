@@ -46,6 +46,14 @@ if os.getenv('RENDER') and '.onrender.com' not in ALLOWED_HOSTS:
     # Allow Render-assigned public hostnames for this app.
     ALLOWED_HOSTS.append('.onrender.com')
 
+# Railway – allow all *.up.railway.app subdomains automatically
+RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN', '').strip()
+if RAILWAY_PUBLIC_DOMAIN and RAILWAY_PUBLIC_DOMAIN not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
+
+if os.getenv('RAILWAY_ENVIRONMENT') and '.up.railway.app' not in str(ALLOWED_HOSTS):
+    ALLOWED_HOSTS.append('.up.railway.app')
+
 
 # Application definition
 
