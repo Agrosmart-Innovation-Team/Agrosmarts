@@ -5,7 +5,7 @@ import {
 } from "./auth";
 
 const DEFAULT_LOCAL_API_BASE_URL = "http://127.0.0.1:8000/api";
-const DEFAULT_PROD_API_BASE_URL = "https://agrosmart-backend.onrender.com/api";
+const DEFAULT_PROD_API_BASE_URL = "https://hackathon-project-production-05d6.up.railway.app/api";
 
 const API_BASE_URL = (
     import.meta.env.VITE_API_BASE_URL ||
