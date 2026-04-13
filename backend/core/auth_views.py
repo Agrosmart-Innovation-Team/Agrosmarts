@@ -1,3 +1,4 @@
+import logging
 import re
 
 from django.conf import settings
@@ -179,19 +180,22 @@ class PasswordResetRequestView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173').rstrip('/')
             reset_link = f"{frontend_url}/reset-password/{uid}/{token}"
-            send_mail(
-                subject='AgroSmart – Password Reset Request',
-                message=(
-                    f"Hi {user.get_full_name() or user.username},\n\n"
-                    f"Click the link below to reset your AgroSmart password:\n\n"
-                    f"{reset_link}\n\n"
-                    "This link expires in 1 hour.\n"
-                    "If you did not request a password reset, you can ignore this email."
-                ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
+            try:
+                send_mail(
+                    subject='AgroSmart – Password Reset Request',
+                    message=(
+                        f"Hi {user.get_full_name() or user.username},\n\n"
+                        f"Click the link below to reset your AgroSmart password:\n\n"
+                        f"{reset_link}\n\n"
+                        "This link expires in 1 hour.\n"
+                        "If you did not request a password reset, you can ignore this email."
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
+            except Exception:
+                logging.getLogger(__name__).exception('Password reset email failed for user %s', user.pk)
 
         # Always return success to prevent account enumeration.
         return Response(

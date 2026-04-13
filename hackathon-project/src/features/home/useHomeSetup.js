@@ -255,11 +255,7 @@ export default function useHomeSetup() {
               setSelectedCrop("Other");
               setCustomCrop(nextCrop);
             }
-          } else if (availableCropOptions.length) {
-            setSelectedCrop((prev) => prev || availableCropOptions[0]);
           }
-        } else if (availableCropOptions.length) {
-          setSelectedCrop((prev) => prev || availableCropOptions[0]);
         }
 
       } catch (error) {
