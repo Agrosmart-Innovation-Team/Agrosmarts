@@ -1,7 +1,9 @@
 import {
     clearAuthSession,
     getAccessToken,
+    getRefreshToken,
     isJwtExpired,
+    setAuthSession,
 } from "./auth";
 
 const DEFAULT_LOCAL_API_BASE_URL = "http://127.0.0.1:8000/api";
@@ -21,10 +23,64 @@ const FORGOT_PASSWORD_ENDPOINT =
 const RESET_PASSWORD_ENDPOINT =
     import.meta.env.VITE_AUTH_RESET_PASSWORD_PATH || "/auth/reset-password";
 
+const REFRESH_ENDPOINT =
+    import.meta.env.VITE_AUTH_REFRESH_PATH || "/auth/token/refresh";
+
 export const AUTH_REQUIRED_EVENT = "agrosmart:auth-required";
+
+let _refreshPromise = null;
 
 function emitAuthRequired(details = {}) {
     window.dispatchEvent(new CustomEvent(AUTH_REQUIRED_EVENT, { detail: details }));
+}
+
+async function refreshAccessToken() {
+    const refresh = getRefreshToken();
+    if (!refresh) {
+        return false;
+    }
+
+    // Deduplicate concurrent refresh attempts
+    if (_refreshPromise) {
+        return _refreshPromise;
+    }
+
+    _refreshPromise = (async () => {
+        try {
+            const response = await fetch(buildUrl(REFRESH_ENDPOINT), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({ refresh }),
+            });
+
+            if (!response.ok) {
+                return false;
+            }
+
+            const data = await response.json();
+            const newAccess = data.access || data.access_token || "";
+            const newRefresh = data.refresh || data.refresh_token || "";
+
+            if (!newAccess) {
+                return false;
+            }
+
+            setAuthSession({
+                accessToken: newAccess,
+                refreshToken: newRefresh || refresh,
+            });
+            return true;
+        } catch {
+            return false;
+        } finally {
+            _refreshPromise = null;
+        }
+    })();
+
+    return _refreshPromise;
 }
 
 function ensureSecureTransport() {
@@ -50,7 +106,7 @@ function buildUrl(path) {
 export async function apiFetch(path, options = {}) {
     ensureSecureTransport();
 
-    const token = getAccessToken();
+    let token = getAccessToken();
     const headers = new Headers(options.headers || {});
 
     headers.set("Accept", "application/json");
@@ -58,6 +114,12 @@ export async function apiFetch(path, options = {}) {
 
     if (!headers.has("Content-Type") && options.body && !(options.body instanceof FormData)) {
         headers.set("Content-Type", "application/json");
+    }
+
+    // If access token is expired but we have a refresh token, refresh first
+    if (token && isJwtExpired(token)) {
+        const refreshed = await refreshAccessToken();
+        token = refreshed ? getAccessToken() : "";
     }
 
     if (token && !isJwtExpired(token)) {
@@ -69,7 +131,12 @@ export async function apiFetch(path, options = {}) {
         headers,
     });
 
-    if (response.status === 401) {
+    // On 401, try to refresh the token and retry once before giving up
+    if (response.status === 401 && !options._retried) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+            return apiFetch(path, { ...options, _retried: true });
+        }
         clearAuthSession();
         if (ENABLE_AUTH_GUARD) {
             emitAuthRequired({ path: buildUrl(path), status: response.status });
