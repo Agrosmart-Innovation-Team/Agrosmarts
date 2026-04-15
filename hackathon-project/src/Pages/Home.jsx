@@ -23,8 +23,8 @@ export default function Home() {
     apiStatus,
     currentStep,
     completionPercent,
+    isSetupComplete,
     handleGeolocate,
-    handleAddAddress,
     handleSubmit,
   } = useHomeSetup();
 
@@ -110,16 +110,6 @@ export default function Home() {
                   <span className="material-symbols-outlined">my_location</span>
                   <span>Use Current GPS Location</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={handleAddAddress}
-                  className="flex items-center gap-3 w-full p-3 rounded-xl border border-primary/20 bg-white dark:bg-background-dark hover:bg-primary/5 transition-colors text-primary font-semibold"
-                >
-                  <span className="material-symbols-outlined">
-                    add_location_alt
-                  </span>
-                  <span>Add Address</span>
-                </button>
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                     map
@@ -151,8 +141,8 @@ export default function Home() {
                   </p>
                 )}
                 <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                  If the map pin is slightly off, type your full address and the
-                  map will update automatically.
+                  Type your home or farm address, or use GPS to place the map
+                  automatically.
                 </p>
                 <div className="h-32 w-full rounded-xl overflow-hidden relative border border-primary/10 bg-center bg-cover">
                   {mapSrc ?
@@ -250,7 +240,7 @@ export default function Home() {
 
             <div className="pt-4 pb-6">
               <button
-                disabled={isSavingSetup}
+                disabled={!isSetupComplete || isSavingSetup}
                 className="w-full bg-primary hover:bg-primary/90 text-gray-900 font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                 type="submit"
               >
@@ -261,9 +251,11 @@ export default function Home() {
                 </span>
                 <span className="material-symbols-outlined">arrow_forward</span>
               </button>
-              <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
-                Fill in all fields above to continue.
-              </p>
+              {!isSetupComplete && (
+                <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                  Fill in all fields above to continue.
+                </p>
+              )}
             </div>
           </form>
         </main>
