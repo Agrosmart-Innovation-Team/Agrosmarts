@@ -8,6 +8,7 @@ User = get_user_model()
 class FarmerProfile(models.Model):
 	owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='farmer_profiles')
 	full_name = models.CharField(max_length=512, blank=True)
+	phone = models.CharField(max_length=64, blank=True)
 	location = models.CharField(max_length=2048, blank=True)
 	crop = models.CharField(max_length=256, blank=True)
 	farm_size = models.FloatField(null=True, blank=True)
