@@ -180,6 +180,7 @@ DEFAULT_CORS_ALLOWED_ORIGINS = [
     'http://localhost:5178',
     'http://localhost:5179',
     'http://127.0.0.1:5173',
+    'https://agrosmarts.vercel.app',
 ]
 
 CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', DEFAULT_CORS_ALLOWED_ORIGINS)
