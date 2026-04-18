@@ -47,7 +47,7 @@ export default function Login() {
               htmlFor="login-identifier"
               className="mb-2 block text-sm font-semibold"
             >
-              Email, phone, or username
+              Email or username
             </label>
             <input
               id="login-identifier"

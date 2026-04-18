@@ -29,17 +29,19 @@ def _is_expired_signed_image_url(image_url):
 class FarmerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = FarmerProfile
-        fields = ['full_name', 'location', 'crop', 'farm_size']
+        fields = ['full_name', 'phone', 'location', 'crop', 'farm_size']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['full_name'] = decrypt_value(instance.full_name) or ''
+        data['phone'] = decrypt_value(instance.phone) or ''
         data['location'] = decrypt_value(instance.location) or ''
         data['crop'] = decrypt_value(instance.crop) or ''
         return data
 
     def create(self, validated_data):
         validated_data['full_name'] = encrypt_value(validated_data.get('full_name', ''))
+        validated_data['phone'] = encrypt_value(validated_data.get('phone', ''))
         validated_data['location'] = encrypt_value(validated_data.get('location', ''))
         validated_data['crop'] = encrypt_value(validated_data.get('crop', ''))
         validated_data['is_encrypted'] = True
@@ -48,6 +50,8 @@ class FarmerProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if 'full_name' in validated_data:
             validated_data['full_name'] = encrypt_value(validated_data.get('full_name', ''))
+        if 'phone' in validated_data:
+            validated_data['phone'] = encrypt_value(validated_data.get('phone', ''))
         if 'location' in validated_data:
             validated_data['location'] = encrypt_value(validated_data.get('location', ''))
         if 'crop' in validated_data:

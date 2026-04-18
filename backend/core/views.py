@@ -88,6 +88,7 @@ class OnboardingProfileView(APIView):
 			return Response(
 				{
 					'full_name': '',
+					'phone': '',
 					'location': '',
 					'crop': '',
 					'farm_size': None,
@@ -100,6 +101,7 @@ class OnboardingProfileView(APIView):
 			return Response(
 				{
 					'full_name': '',
+					'phone': '',
 					'location': '',
 					'crop': '',
 					'farm_size': None,

@@ -21,6 +21,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import FarmerProfile
+from .security import encrypt_value
 
 
 def get_user_role(user):
@@ -122,9 +123,14 @@ class RegisterView(APIView):
         # Initialize a profile row at signup so onboarding updates an existing record.
         profile, _ = FarmerProfile.objects.get_or_create(owner=user)
         full_name = serializer.validated_data.get('full_name', '').strip()
-        if full_name and profile.full_name != full_name:
-            profile.full_name = full_name
-            profile.save(update_fields=['full_name'])
+        phone = serializer.validated_data.get('phone', '').strip()
+        if full_name or phone:
+            if full_name:
+                profile.full_name = encrypt_value(full_name)
+            if phone:
+                profile.phone = encrypt_value(phone)
+            profile.is_encrypted = True
+            profile.save(update_fields=['full_name', 'phone', 'is_encrypted'])
 
         token_data = _token_payload_for(user)
         return Response(
